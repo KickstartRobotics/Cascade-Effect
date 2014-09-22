@@ -1,0 +1,75 @@
+Psuedo Code
+
+
+
+Block Autonomous
+
+Move robot toward basket backward
+Stop robot in front of basket
+Move arm and drop block in the bucket
+End program
+
+
+Left Block and Ramp Autonomous
+
+Move robot toward basket backward
+Stop robot in front of basket
+Move arm and drop block in the bucket
+Move back toward wall
+Turn 90* right toward ramp
+Move foward till in front of ramp
+Turn 90* right so facing ramp
+Drive up the ramp
+End program
+
+
+Left Ramp Autonomous
+
+Move foward away from the wall
+Turn left 45*, perpendicular to the ramp
+Move foward till in front of ramp
+Turn 90* right so facing ramp
+Drive up the ramp
+End program
+
+
+Right Block and Ramp Autonomous
+
+Move robot toward basket backward
+Stop robot in front of basket
+Move arm and drop block in the bucket
+Move back toward wall
+Turn 90* left toward ramp
+Move foward till in front of ramp
+Turn 90* left so facing ramp
+Drive up the ramp
+End program
+
+
+Right Ramp Autonomous
+
+Move foward away from the wall
+Turn right 45*, perpendicular to the ramp
+Move foward till in front of ramp
+Turn 90* left so facing ramp
+Drive up the ramp
+End program
+
+
+TeleOp
+
+Stop motors from rotating on their own
+Set servo change rate to 0 (slower)
+Set the bucket to the down position
+
+Check for input controlling the Arm
+	- Left Trigger - Rotate arm forward
+	- Left Button - Rotate arm backward
+Check for input controlling the Flag Raiser
+	- Right Trigger - Rotate flag raiser forward
+	- Right Button - Rotate flag raiser backward
+Check for input controllint the Bucket
+	- X Button - Set arm to minimum (starting) position
+	- A Button - Set arm to half (driving) position
+	- B Button - Set arm to maximum (dumping) position
+	- Y Button - Set arm to ground (collecting) position
