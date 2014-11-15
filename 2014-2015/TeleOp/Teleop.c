@@ -38,7 +38,7 @@ const int BUTTONRT 			= 8;
 
 void initializeRobot()
 {
-	servo[liftToggle] = 140; //Initializes servo to start position
+	servo[liftToggle] = 130; //Initializes servo to start position
   return;
 }
 
@@ -48,14 +48,14 @@ void moveServo()
 	//Moves servo to down position if the a button is pressed
 	if(joy1Btn(BUTTONA))
 		{
-			servo[liftToggle] = 240;
+			servo[liftToggle] = 250;
 			wait1Msec(1);
 		}
 
 	//Moves servo to up position if the b button is pressed
 		if(joy1Btn(BUTTONB))
 		{
-			servo[liftToggle] = 140;
+			servo[liftToggle] = 130;
 			wait1Msec(1);
 		}
 }
