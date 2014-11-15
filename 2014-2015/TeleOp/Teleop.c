@@ -74,6 +74,32 @@ void runConveyer()
 	}
 }
 
+void moveLift()
+{
+	//Moves the lift upwards
+	if(joy1Btn(BUTTONRT))
+	{
+			motor(liftMotor) = 10;
+			wait1Msec(1);
+	}
+	else
+	{
+		motor(liftMotor) = 0;
+		wait1Msec(1);
+	}
+	//Moves the lift down
+	if(joy1Btn(BUTTONLT))
+	{
+			motor(liftMotor) = -10;
+			wait1Msec(1);
+	}
+	else
+	{
+		motor(liftMotor) = 0;
+		wait1Msec(1);
+	}
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                         Main Task
@@ -102,7 +128,7 @@ void runConveyer()
 
 task main()
 {
-  initializeRobot();
+  initializeRobot();   //Sets servos into
 
   waitForStart();   // Waits for start of tele-op phase
 
@@ -115,6 +141,7 @@ task main()
  	  motor[ driveLeft ] 		= joystick.joy1_y2;
   	motor[ driveRight ] 		= joystick.joy1_y1;
   	runConveyer();
+  	moveLift();
   	moveServo();
 
   }
