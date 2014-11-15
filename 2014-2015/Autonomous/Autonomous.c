@@ -75,13 +75,13 @@ task main()
 
   waitForStart(); // Wait for the beginning of autonomous phase.
 
-  ///////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////
-  ////                                                   ////
-  ////    Add your robot specific autonomous code here.  ////
-  ////                                                   ////
-  ///////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////
+  motor[driveLeft]  = 50;
+  motor[driveRight] = 50;
+  wait(4.0)
+
+  motor[driveLeft]  = 0;
+  motor[driveRight] = 0;
+
 
   while (true)
   {}
