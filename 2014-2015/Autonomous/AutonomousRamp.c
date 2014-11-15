@@ -3,7 +3,7 @@
 #pragma config(Hubs,  S2, HTServo,  none,     none,     none)
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Sensor, S2,     ,               sensorI2CMuxController)
-#pragma config(Motor,  mtr_S1_C1_1,     driveLeft,     tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C1_1,     driveLeft,     tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C1_2,     driveRight,    tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_1,     beltMotor,     tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_2,     liftMotor,     tmotorTetrix, openLoop)
@@ -75,8 +75,8 @@ task main()
 
   waitForStart(); // Wait for the beginning of autonomous phase.
 
-  motor[driveLeft]  = 50;
-  motor[driveRight] = 50;
+  motor[driveLeft]  = -50;
+  motor[driveRight] = -50;
   wait1Msec(3000);
 
   motor[driveLeft]  = 0;

@@ -3,8 +3,8 @@
 #pragma config(Hubs,  S2, HTServo,  none,     none,     none)
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Sensor, S2,     ,               sensorI2CMuxController)
-#pragma config(Motor,  mtr_S1_C1_1,     driveLeft,     tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C1_2,     driveRight,    tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C1_1,     driveRight,     tmotorTetrix, openLoop, reversed)
+#pragma config(Motor,  mtr_S1_C1_2,     driveLeft,    tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_1,     beltMotor,     tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_2,     liftMotor,     tmotorTetrix, openLoop)
 #pragma config(Servo,  srvo_S2_C1_1,    liftToggle,           tServoStandard)
@@ -38,7 +38,7 @@ const int BUTTONRT 			= 8;
 
 void initializeRobot()
 {
-	servo[liftToggle] = 130; //Initializes servo to start position
+	servo[ liftToggle ] = 130; //Initializes servo to start position
   return;
 }
 
@@ -46,30 +46,35 @@ void initializeRobot()
 void moveServo()
 {
 	//Moves servo to down position if the a button is pressed
-	if(joy1Btn(BUTTONA))
+	if( joy1Btn( BUTTONA ) )
 		{
-			servo[liftToggle] = 250;
+			servo[ liftToggle ] = 250;
 			wait1Msec(1);
 		}
 
 	//Moves servo to up position if the b button is pressed
-		if(joy1Btn(BUTTONB))
+		if( joy1Btn( BUTTONB ) )
 		{
-			servo[liftToggle] = 130;
+			servo[ liftToggle ] = 130;
 			wait1Msec(1);
 		}
 }
 
 void runConveyer()
 {
-	if(joy1Btn(BUTTONRB))
+	if( joy1Btn( BUTTONRB ) )
 	{
-		motor[beltMotor] = 10;
+		motor[ beltMotor ] = 15;
 		wait1Msec(1);
 	}
+	else if ( joy1Btn( BUTTONLB ) )
+  {
+  	motor[ beltMotor ] = -15;
+  	wait1Msec(1);
+  }
 	else
 	{
-		motor[beltMotor] = 0;
+		motor[ beltMotor ] = 0;
 		wait1Msec(1);
 	}
 }
@@ -77,26 +82,26 @@ void runConveyer()
 void moveLift()
 {
 	//Moves the lift upwards
-	if(joy1Btn(BUTTONRT))
+	if( joy1Btn( BUTTONRT ) )
 	{
-			motor(liftMotor) = 10;
-			wait1Msec(1);
+			motor( liftMotor ) = 100;
+			wait1Msec(10);
 	}
 	else
 	{
-		motor(liftMotor) = 0;
-		wait1Msec(1);
+		motor( liftMotor ) = 0;
+		wait1Msec(10);
 	}
 	//Moves the lift down
-	if(joy1Btn(BUTTONLT))
+	if( joy1Btn( BUTTONLT ) )
 	{
-			motor(liftMotor) = -10;
-			wait1Msec(1);
+			motor( liftMotor ) = -100;
+			wait1Msec(10);
 	}
 	else
 	{
-		motor(liftMotor) = 0;
-		wait1Msec(1);
+		motor( liftMotor ) = 0;
+		wait1Msec(10);
 	}
 }
 
@@ -132,13 +137,13 @@ task main()
 
   waitForStart();   // Waits for start of tele-op phase
 
-  while (true)
+  while ( true )
   {
   	//Updates joystick variables with data from joystick station
 		getJoystickSettings( joystick );
 
 		//Recieves joystick data from controllers then sets the motor's power equal to the value of the joystick.
- 	  motor[ driveLeft ] 		= joystick.joy1_y2;
+ 	  motor[ driveLeft ] 		  = joystick.joy1_y2;
   	motor[ driveRight ] 		= joystick.joy1_y1;
   	runConveyer();
   	moveLift();
