@@ -43,6 +43,7 @@ void initializeRobot()
 {
   // Place code here to sinitialize servos to starting positions.
   // Sensors are automatically configured and setup by ROBOTC. They may need a brief time to stabilize.
+	const int STARTPOSITION = 140;
 	servo[liftToggle] = 140; //Initializes servo to start position
   return;
 }
@@ -74,13 +75,14 @@ task main()
   initializeRobot();
 
   waitForStart(); // Wait for the beginning of autonomous phase.
+	const int MOVESPEED = -50;
+  motor[driveLeft]  = MOVESPEED;
+  motor[driveRight] = MOVESPEED;
+  wait1Msec(2500);
 
-  motor[driveLeft]  = -50;
-  motor[driveRight] = -50;
-  wait1Msec(3000);
-
-  motor[driveLeft]  = 0;
-  motor[driveRight] = 0;
+  const int STOP = 0;
+  motor[driveLeft]  = STOP;
+  motor[driveRight] = STOP;
   wait1Msec(1);
 
   while (true)

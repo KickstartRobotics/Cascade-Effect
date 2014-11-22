@@ -38,7 +38,8 @@ const int BUTTONRT 			= 8;
 
 void initializeRobot()
 {
-	servo[ liftToggle ] = 130; //Initializes servo to start position
+	const int STARTPOSITION = 140;
+	servo[ liftToggle ] = STARTPOSITION; //Initializes servo to start position
   return;
 }
 
@@ -46,35 +47,40 @@ void initializeRobot()
 void moveServo()
 {
 	//Moves servo to down position if the a button is pressed
-	if( joy1Btn( BUTTONA ) )
+	if( joy1Btn( BUTTONA ) || joy2Btn( BUTTONA ) )
 		{
-			servo[ liftToggle ] = 250;
+			const int DUMP = 250;
+			servo[ liftToggle ] = DUMP;
 			wait1Msec(1);
 		}
 
 	//Moves servo to up position if the b button is pressed
-		if( joy1Btn( BUTTONB ) )
+		if( joy1Btn( BUTTONB ) || joy2Btn( BUTTONB ) )
 		{
-			servo[ liftToggle ] = 130;
+			const int UP = 130;
+			servo[ liftToggle ] = UP;
 			wait1Msec(1);
 		}
 }
 
 void runConveyer()
 {
-	if( joy1Btn( BUTTONRB ) )
+	if( joy1Btn( BUTTONRB ) || joy2Btn( BUTTONRB ) )
 	{
-		motor[ beltMotor ] = 15;
+		const int CLOCKWISE = 15;
+		motor[ beltMotor ] = CLOCKWISE;
 		wait1Msec(1);
 	}
-	else if ( joy1Btn( BUTTONLB ) )
+	else if ( joy1Btn( BUTTONLB ) || joy2Btn( BUTTONLB ) )
   {
-  	motor[ beltMotor ] = -15;
+  	const int C_CLOCKWISE = -15;
+  	motor[ beltMotor ] = C_CLOCKWISE;
   	wait1Msec(1);
   }
 	else
 	{
-		motor[ beltMotor ] = 0;
+		const int STOP = 0;
+		motor[ beltMotor ] = STOP;
 		wait1Msec(1);
 	}
 }
@@ -82,25 +88,23 @@ void runConveyer()
 void moveLift()
 {
 	//Moves the lift upwards
-	if( joy1Btn( BUTTONRT ) )
+	if( joy1Btn( BUTTONRT ) || joy2Btn( BUTTONRT ) )
 	{
-			motor( liftMotor ) = 100;
+			const int UP = 100;
+			motor( liftMotor ) = UP;
+			wait1Msec(10);
+	}
+	//Moves lift downwards
+	else if( joy1Btn( BUTTONLT ) || joy2Btn( BUTTONLT ) )
+	{
+			const int DOWN = -100;
+			motor( liftMotor ) = DOWN;
 			wait1Msec(10);
 	}
 	else
 	{
-		motor( liftMotor ) = 0;
-		wait1Msec(10);
-	}
-	//Moves the lift down
-	if( joy1Btn( BUTTONLT ) )
-	{
-			motor( liftMotor ) = -100;
-			wait1Msec(10);
-	}
-	else
-	{
-		motor( liftMotor ) = 0;
+		const int STOP = 0;
+		motor( liftMotor ) = STOP;
 		wait1Msec(10);
 	}
 }
@@ -143,8 +147,8 @@ task main()
 		getJoystickSettings( joystick );
 
 		//Recieves joystick data from controllers then sets the motor's power equal to the value of the joystick.
- 	  motor[ driveLeft ] 		  = joystick.joy1_y2;
-  	motor[ driveRight ] 		= joystick.joy1_y1;
+ 	  motor[ driveLeft ] 		  = joystick.joy1_y2 + joystick.joy2_y2;
+  	motor[ driveRight ] 		= joystick.joy1_y1 + joystick.joy2_y1;
   	runConveyer();
   	moveLift();
   	moveServo();
