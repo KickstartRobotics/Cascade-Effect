@@ -23,26 +23,52 @@ const int BUTTONLB 			= 5;
 const int BUTTONRB 			= 6;
 const int BUTTONLT 			= 7;
 const int BUTTONRT 			= 8;
+bool sloMo 							= false;
 
+//*Global Variables*//
+double moveModifier				= 1;
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//                                    initializeRobot
-//
-// Prior to the start of tele-op mode, you may want to perform some initialization on your robot
-// and the variables within your program.
-//
-// In most cases, you may not have to add any code to this function and it will remain "empty".
-//
-/////////////////////////////////////////////////////////////////////////////////////////////////////
+//*Function Prototypes
+void initializeRobot();
+void moveRobot();
+void moveLift();
+void runConveyer();
+void toggleSloMo();
 
+//The main task will run the robot initialization and then will wait for the signal from FCS
+//to begin and enter the continuous loop that recieves joystick values and executes functions
+//with this data.
+task main()
+{
+  initializeRobot();   //Sets servos into
+
+  waitForStart();   // Waits for start of tele-op phase
+	int sloMoCounter = 0;
+	int directionCounter = 0
+  while ( true )
+  {
+
+  	//Updates joystick variables with data from joystick station
+		getJoystickSettings( joystick );
+		moveRobot();
+		sloMoCounter = toggleSloMo(sloMoCounter);
+		directionCounter = toggleDirection(directionCounter);
+  	runConveyer();
+  	moveLift();
+  	moveServo();
+
+  }
+}
+//*Functions*//
+
+//Sets all values and servos prior to the start of the telop mode.
 void initializeRobot()
 {
 	servo[ liftToggle ] = 130; //Initializes servo to start position
   return;
 }
 
-//*Functions*//
+//
 void moveServo()
 {
 	//Moves servo to down position if the a button is pressed
@@ -105,49 +131,45 @@ void moveLift()
 	}
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//                                         Main Task
-//
-// The following is the main code for the tele-op robot operation.
-//
-// Game controller / joystick information is sent periodically (about every 50 milliseconds) from
-// the FMS (Field Management System) to the robot. Most tele-op programs will follow the following
-// logic:
-//   1. Loop forever repeating the following actions:
-//   2. Get the latest game controller / joystick settings that have been received from the PC.
-//   3. Perform appropriate actions based on the joystick + buttons settings. This is usually a
-//      simple action:
-//      *  Joystick values are usually directly translated into power levels for a motor or
-//         position of a servo.
-//      *  Buttons are usually used to start/stop a motor or cause a servo to move to a specific
-//         position.
-//   4. Repeat the loop.
-//
-// Your program needs to continuously loop because you need to continuously respond to changes in
-// the game controller settings.
-//
-// At the end of the tele-op period, the FMS will autonmatically abort (stop) execution of the program.
-//
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-task main()
+int toggleSloMo(int counter)
 {
-  initializeRobot();   //Sets servos into
+	int counter;
+	if(joy1Btn( BUTTONY ))
+	{
+		return counter+1;
 
-  waitForStart();   // Waits for start of tele-op phase
+		if(c > 100)
+		{
+			moveModifier = 4;
+			return 0;
+		}
+	}
+	else
+	{
+		return 0;
+	}
+}
+int toggleDirection()
+{
+	if(joy1Btn( BUTTONY ))
+	{
+		return counter+1;
 
-  while ( true )
-  {
-  	//Updates joystick variables with data from joystick station
-		getJoystickSettings( joystick );
-
-		//Recieves joystick data from controllers then sets the motor's power equal to the value of the joystick.
- 	  motor[ driveLeft ] 		  = joystick.joy1_y2;
-  	motor[ driveRight ] 		= joystick.joy1_y1;
-  	runConveyer();
-  	moveLift();
-  	moveServo();
-
-  }
+		if(counter > 100)
+		{
+			moveModifier = 4;
+			return 0;
+		}
+	}
+	else
+	{
+		return 0;
+	}
+}
+//Recieves joystick data from controllers then modifies that value
+//and sets the motor equal to the modified value.
+void moveRobot()
+{
+		motor[ driveLeft ] 		  = joystick.joy1_y2 / moveModifier;
+  	motor[ driveRight ] 		= joystick.joy1_y1 / moveModifier;
 }
