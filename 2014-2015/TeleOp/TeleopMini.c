@@ -1,7 +1,7 @@
 #pragma config(Hubs,  S1, HTMotor,  none,     none,     none)
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Motor,  mtr_S1_C1_1,     driveRight,    tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C1_2,     driveLeft,     tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C1_2,     driveLeft,     tmotorTetrix, openLoop, reversed)
 //#pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 //#pragma config(Sensor, S2,     ,               sensorI2CMuxController)
 //#pragma config(Motor,  mtr_S1_C2_1,     beltMotor,     tmotorTetrix, openLoop)
@@ -143,15 +143,15 @@ int toggleSloMo(int counter)
 
 		if( counter > 100 && !sloMo )
 		{
-			moveModifier = 10;
+			moveModifier *= 10;
 			sloMo = true;
-			return 0;
+			return -1000;
 		}
 		else if(counter > 100)
 		{
-			moveModifier = 1;
+			moveModifier /= 10;
 			sloMo = false;
-			return 0;
+			return -1000;
 		}
 		else
 		{
@@ -170,15 +170,15 @@ int toggleDirection(int counter)
 
 		if(counter > 100 && !direction)
 		{
-			moveModifier = -1;
+			moveModifier *= -1;
 			direction = true;
-			return 0;
+			return -1000;
 		}
 		else if(counter > 100)
 		{
-			moveModifier = 1;
+			moveModifier *= -1;
 			direction = false;
-			return 0;
+			return -1000;
 		}
 		else
 		{
@@ -194,6 +194,14 @@ int toggleDirection(int counter)
 //and sets the motor equal to the modified value.
 void moveRobot()
 {
-		motor[driveLeft] 		  = joystick.joy1_y2 / moveModifier;
-  	motor[driveRight] 		= joystick.joy1_y1 / moveModifier;
+	if ( ( joystick.joy1_y1 > -5 && joystick.joy1_y1 < 5 ) && ( joystick.joy1_y2 > -5 && joystick.joy1_y2 < 5 ) )
+	{
+		 motor[ driveLeft ] = 0;
+	   motor[ driveRight ] = 0;
+	}
+	else
+	{
+		motor[ driveLeft ] 		  = joystick.joy1_y2 / moveModifier;
+  	motor[ driveRight ] 		= joystick.joy1_y1 / moveModifier;
+  }
 }
