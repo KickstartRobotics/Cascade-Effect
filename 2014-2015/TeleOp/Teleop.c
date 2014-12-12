@@ -12,7 +12,6 @@
 //*Includes*//
 #pragma debuggerWindows("joystickGame");
 #include "JoystickDriver.c" //Include file to "handle" the Bluetooth messages.
-//#include "controlFunctions.h"
 
 //*Constants*//
 const int BUTTONX  			= 1;
@@ -23,19 +22,23 @@ const int BUTTONLB 			= 5;
 const int BUTTONRB 			= 6;
 const int BUTTONLT 			= 7;
 const int BUTTONRT 			= 8;
-bool sloMo 							= false;
-bool direction 					= false;
+
 
 //*Global Variables*//
-float moveModifier				= 1;
+float moveModifier			= 1;
+bool shiftSloMo 				= false;
+bool shiftDirection			= false;
 
 //*Function Prototypes
-//void initializeRobot();
+void initializeRobot();
 void moveRobot();
+void toggleSlow();
+void toggleDirection();
+void toggleGoalMover();
 //void moveLift();
 //void runConveyer();
-int toggleSloMo(int counter);
-int toggleDirection(int counter);
+
+
 
 
 //The main task will run the robot initialization and then will wait for the signal from FCS
@@ -43,19 +46,18 @@ int toggleDirection(int counter);
 //with this data.
 task main()
 {
-  //initializeRobot();   //Sets servos into
+  initializeRobot();   //Sets servos into starting positions
 
   waitForStart();   // Waits for start of tele-op phase
-	int sloMoCounter = 0;
-	int directionCounter = 0;
   while ( true )
   {
 
   	//Updates joystick variables with data from joystick station
 		getJoystickSettings( joystick );
 		moveRobot();
-		sloMoCounter = toggleSloMo(sloMoCounter);
-		directionCounter = toggleDirection(directionCounter);
+		toggleSlow();
+		toggleDirection();
+		toggleGoalMover();
   	//runConveyer();
   	//moveLift();
   	//moveServo();
@@ -65,12 +67,80 @@ task main()
 //*Functions*//
 
 //Sets all values and servos prior to the start of the telop mode.
-/*void initializeRobot()
+void initializeRobot()
 {
-	servo[ liftToggle ] = 130; //Initializes servo to start position
+	servo[goalServo] = 130; //Initializes servo to start position
   return;
 }
 
+//Recieves joystick data from controllers then modifies that value
+//and sets the motor equal to the modified value.
+void moveRobot()
+{
+		motor[driveLeft] 		  = joystick.joy1_y2 / moveModifier;
+  	motor[driveRight] 		= joystick.joy1_y1 / moveModifier;
+}
+
+void toggleSlow()
+{
+	if(joy1Btn(BUTTONA))
+	{
+		if(!shiftSlowMo && abs(moveModifier) == 1)
+		{
+			moveModifier *= 10;
+		}
+
+		else if(!shift && abs(moveModifier) > 1)
+		{
+			moveModifier /= 10;
+		}
+		shiftSloMo = true;
+	}
+	else
+	{
+		shiftSloMo = false;
+	}
+}
+
+void toggleDirection()
+{
+	if(joy1Btn(BUTTONY))
+	{
+		if(!shiftDirection)
+		{
+			moveModifier *= -1;
+		}
+		shiftDirection = true;
+	}
+	else
+	{
+			shiftDirection = false;
+	}
+}
+
+void toggleGoalMover()
+{
+	if(joy1Btn(BUTTONB))
+	{
+		int upPosition;
+		int downPosition;
+
+		if(!shiftGoal && ServoValue[goalServo] == upPosition)
+		{
+			servo[goalServo] = downPosition;
+		}
+		else if(!shiftGoal && ServoValue[goalServo] == downPosition)
+		{
+			servo[goalServo] = upPosition;
+		}
+		shiftGoal = true;
+	}
+	else
+	{
+		shiftGoal = false;
+	}
+}
+/*
 //
 void moveServo()
 {
@@ -136,64 +206,3 @@ void moveLift()
 }
 */
 
-int toggleSloMo(int counter)
-{
-	if(joy1Btn( BUTTONA ))
-	{
-
-		if( counter > 100 && !sloMo )
-		{
-			moveModifier = 10;
-			sloMo = true;
-			return 0;
-		}
-		else if(counter > 100)
-		{
-			moveModifier = 1;
-			sloMo = false;
-			return 0;
-		}
-		else
-		{
-		return ++counter;
-		}
-	}
-	else
-	{
-		return 0;
-	}
-}
-int toggleDirection(int counter)
-{
-	if(joy1Btn( BUTTONY ))
-	{
-
-		if(counter > 100 && !direction)
-		{
-			moveModifier = -1;
-			direction = true;
-			return 0;
-		}
-		else if(counter > 100)
-		{
-			moveModifier = 1;
-			direction = false;
-			return 0;
-		}
-		else
-		{
-				return ++counter;
-		}
-	}
-	else
-	{
-		return 0;
-	}
-}
-//Recieves joystick data from controllers then modifies that value
-//and sets the motor equal to the modified value.
-void moveRobot()
-{
-		motor[driveLeft] 		  = joystick.joy1_y2 / moveModifier;
-  	motor[driveRight] 		= joystick.joy1_y1 / moveModifier;
-}
