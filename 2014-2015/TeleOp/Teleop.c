@@ -7,8 +7,8 @@
 #pragma config(Motor,  motorC,           ,             tmotorNXT, openLoop)
 #pragma config(Motor,  mtr_S1_C1_1,     driveRight,    tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C1_2,     driveLeft,     tmotorTetrix, openLoop, reversed)
-#pragma config(Motor,  mtr_S1_C2_1,     motorF,        tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C2_2,     ballShooter,   tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C2_1,     beltMotor,        tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C2_2,     ballShooter,   tmotorTetrix, openLoop, reversed)
 #pragma config(Servo,  srvo_S2_C1_1,    goalServo,            tServoStandard)
 #pragma config(Servo,  srvo_S2_C1_2,    servo2,               tServoNone)
 #pragma config(Servo,  srvo_S2_C1_3,    servo3,               tServoNone)
@@ -38,6 +38,12 @@ const int BUTTONRB 			= 6;
 const int BUTTONLT 			= 7;
 const int BUTTONRT 			= 8;
 
+//*Motor constants*//
+const int MAXPOWER			     = 100;
+const int THREEQUARTERSPOWER = 75;
+const int HALFPOWER					 = 50;
+const int BELTPOWER					 = 15;
+const int NOPOWER						 = 0;
 
 //*Global Variables*//
 float moveModifier			= 1;
@@ -52,8 +58,7 @@ void toggleSlow();
 void toggleDirection();
 void toggleGoalMover();
 void ballLauncher();
-//void moveLift();
-//void runConveyer();
+void runConveyer();
 
 
 
@@ -76,10 +81,7 @@ task main()
 		toggleDirection();
 		toggleGoalMover();
 		ballLauncher();
-  	//runConveyer();
-  	//moveLift();
-  	//moveServo();
-
+  	runConveyer();
   }
 }
 //*Functions*//
@@ -87,7 +89,7 @@ task main()
 //Sets all values and servos prior to the start of the telop mode.
 void initializeRobot()
 {
-	servo[goalServo] = 135; //Initializes servo to start position
+	servo[goalServo] = 9; //Initializes servo to start position
 }
 
 //Recieves joystick data from controllers then modifies that value
@@ -102,24 +104,24 @@ void moveRobot()
 	}
 	else
 	{
-		motor[driveLeft]	= joystick.joy1_y2 / moveModifier;
-		motor[driveRight]	= joystick.joy1_y1 / moveModifier;
+		motor[driveRight]	= joystick.joy1_y2 / moveModifier;
+		motor[driveLeft]	= joystick.joy1_y1 / moveModifier;
 	}
 
 }
 
 void toggleSlow()
 {
-	if(joy1Btn(BUTTONA))
+	if(joy1Btn(BUTTONA) || joy2Btn(BUTTONA))
 	{
 		if(!shiftSlowMo && abs(moveModifier) == 1)
 		{
-			moveModifier *= 10;
+			moveModifier *= 5; //divides the input of controllers to motors by 5
 		}
 
 		else if(!shiftSlowMo && abs(moveModifier) > 1)
 		{
-			moveModifier /= 10;
+			moveModifier /= 5; //changes the input of controllers to motors back to 1
 		}
 		shiftSlowMo = true;
 	}
@@ -131,11 +133,11 @@ void toggleSlow()
 
 void toggleDirection()
 {
-	if(joy1Btn(BUTTONY))
+	if(joy1Btn(BUTTONY) || joy2Btn(BUTTONY))
 	{
 		if(!shiftDirection)
 		{
-			moveModifier *= -1;
+			moveModifier *= -1; //changes the controller input to the motors to the oppisite of what it is
 		}
 		shiftDirection = true;
 	}
@@ -147,10 +149,10 @@ void toggleDirection()
 
 void toggleGoalMover()
 {
-	if(joy1Btn(BUTTONB))
+	if(joy1Btn(BUTTONB) || joy2Btn(BUTTONB))
 	{
-		int upPosition = 135;
-		int downPosition = 250;
+		int upPosition = 0;
+		int downPosition = 190;
 
 		if(!shiftGoal && ServoValue[goalServo] != downPosition)
 		{
@@ -170,78 +172,39 @@ void toggleGoalMover()
 
 void ballLauncher()
 {
-	if(joy1Btn(BUTTONX))
+	if(joy1Btn(BUTTONX) || joy2Btn(BUTTONX))
 	{
-		motor[ballShooter]	=	50;
+		motor[ballShooter]	=	HALFPOWER;
+	}
+	else if(joy1Btn(BUTTONLT) || joy2Btn(BUTTONLT))
+	{
+		motor[ballShooter] = THREEQUARTERSPOWER;
+	}
+	else if(joy1Btn(BUTTONRT) || joy2Btn(BUTTONRT))
+	{
+		motor[ballShooter] = MAXPOWER;
 	}
 	else
 	{
-		motor[ballShooter]	=	0;
+		motor[ballShooter]	=	NOPOWER;
 	}
 }
-/*
-//
-void moveServo()
-{
-	//Moves servo to down position if the a button is pressed
-	if( joy1Btn( BUTTONA ) )
-		{
-			servo[ liftToggle ] = 250;
-			wait1Msec(1);
-		}
-
-	//Moves servo to up position if the b button is pressed
-		if( joy1Btn( BUTTONB ) )
-		{
-			servo[ liftToggle ] = 130;
-			wait1Msec(1);
-		}
-}
-
 
 void runConveyer()
 {
-	if( joy1Btn( BUTTONRB ) )
+	if( joy1Btn( BUTTONRB ) || joy2Btn(BUTTONRB))
 	{
-		motor[ beltMotor ] = 15;
+		motor[ beltMotor ] = BELTPOWER;
 		wait1Msec(1);
 	}
-	else if ( joy1Btn( BUTTONLB ) )
+	else if ( joy1Btn( BUTTONLB ) || joy2Btn(BUTTONLB))
   {
-  	motor[ beltMotor ] = -15;
+  	motor[ beltMotor ] = -BELTPOWER;
   	wait1Msec(1);
   }
 	else
 	{
-		motor[ beltMotor ] = 0;
+		motor[ beltMotor ] = NOPOWER;
 		wait1Msec(1);
 	}
 }
-
-void moveLift()
-{
-	//Moves the lift upwards
-	if( joy1Btn( BUTTONRT ) )
-	{
-			motor( liftMotor ) = 100;
-			wait1Msec(10);
-	}
-	else
-	{
-		motor( liftMotor ) = 0;
-		wait1Msec(10);
-	}
-	//Moves the lift down
-	if( joy1Btn( BUTTONLT ) )
-	{
-			motor( liftMotor ) = -100;
-			wait1Msec(10);
-	}
-	else
-	{
-		motor( liftMotor ) = 0;
-		wait1Msec(10);
-	}
-}
-*/
-
