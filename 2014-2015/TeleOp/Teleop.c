@@ -7,8 +7,8 @@
 #pragma config(Motor,  motorC,           ,             tmotorNXT, openLoop)
 #pragma config(Motor,  mtr_S1_C1_1,     driveRight,    tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C1_2,     driveLeft,     tmotorTetrix, openLoop, reversed)
-#pragma config(Motor,  mtr_S1_C2_1,     beltMotor,        tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C2_2,     ballShooter,   tmotorTetrix, openLoop, reversed)
+#pragma config(Motor,  mtr_S1_C2_1,     scissorLifter, tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C2_2,     ballShooter,   tmotorTetrix, openLoop)
 #pragma config(Servo,  srvo_S2_C1_1,    goalServo,            tServoStandard)
 #pragma config(Servo,  srvo_S2_C1_2,    servo2,               tServoNone)
 #pragma config(Servo,  srvo_S2_C1_3,    servo3,               tServoNone)
@@ -57,8 +57,7 @@ void moveRobot();
 void toggleSlow();
 void toggleDirection();
 void toggleGoalMover();
-void ballLauncher();
-void runConveyer();
+void scissorLift();
 
 
 
@@ -80,8 +79,7 @@ task main()
 		toggleSlow();
 		toggleDirection();
 		toggleGoalMover();
-		ballLauncher();
-  	runConveyer();
+		scissorLift();
   }
 }
 //*Functions*//
@@ -149,16 +147,16 @@ void toggleDirection()
 
 void toggleGoalMover()
 {
-	if(joy1Btn(BUTTONB) || joy2Btn(BUTTONB))
+	if( joy1Btn( BUTTONB ) || joy2Btn( BUTTONB ))
 	{
 		int upPosition = 0;
-		int downPosition = 190;
+		int downPosition = 195;
 
-		if(!shiftGoal && ServoValue[goalServo] != downPosition)
+		if( !shiftGoal && ServoValue[goalServo] != downPosition )
 		{
 			servo[goalServo] = downPosition;
 		}
-		else if(!shiftGoal && ServoValue[goalServo] != upPosition)
+		else if( !shiftGoal && ServoValue[goalServo] != upPosition )
 		{
 			servo[goalServo] = upPosition;
 		}
@@ -170,41 +168,18 @@ void toggleGoalMover()
 	}
 }
 
-void ballLauncher()
+void scissorLift()
 {
-	if(joy1Btn(BUTTONX) || joy2Btn(BUTTONX))
+	if( joy1Btn( BUTTONRB ) || joy2Btn( BUTTONRB ) )
 	{
-		motor[ballShooter]	=	HALFPOWER;
+		motor[scissorLifter] = HALFPOWER;
 	}
-	else if(joy1Btn(BUTTONLT) || joy2Btn(BUTTONLT))
+	else if( joy1Btn( BUTTONRT ) || joy2Btn( BUTTONRT ) )
 	{
-		motor[ballShooter] = THREEQUARTERSPOWER;
-	}
-	else if(joy1Btn(BUTTONRT) || joy2Btn(BUTTONRT))
-	{
-		motor[ballShooter] = MAXPOWER;
+		motor[scissorLifter] = -HALFPOWER;
 	}
 	else
 	{
-		motor[ballShooter]	=	NOPOWER;
-	}
-}
-
-void runConveyer()
-{
-	if( joy1Btn( BUTTONRB ) || joy2Btn(BUTTONRB))
-	{
-		motor[ beltMotor ] = BELTPOWER;
-		wait1Msec(1);
-	}
-	else if ( joy1Btn( BUTTONLB ) || joy2Btn(BUTTONLB))
-  {
-  	motor[ beltMotor ] = -BELTPOWER;
-  	wait1Msec(1);
-  }
-	else
-	{
-		motor[ beltMotor ] = NOPOWER;
-		wait1Msec(1);
+		motor[scissorLifter] = NOPOWER;
 	}
 }
