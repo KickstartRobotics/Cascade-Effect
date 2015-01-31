@@ -1,13 +1,11 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  none,     none)
 #pragma config(Hubs,  S2, HTServo,  none,     none,     none)
-#pragma config(Sensor, S1,     ,               sensorI2CMuxController)
-#pragma config(Sensor, S2,     ,               sensorI2CMuxController)
-#pragma config(Sensor, S3,     IRSensor,       sensorHiTechnicIRSeeker1200)
-#pragma config(Motor,  mtr_S1_C1_1,     driveLeft,     tmotorTetrix, openLoop, reversed, encoder)
-#pragma config(Motor,  mtr_S1_C1_2,     driveRight,    tmotorTetrix, openLoop, encoder)
+#pragma config(Sensor, S3,     SonarSensor,    sensorSONAR)
+#pragma config(Motor,  mtr_S1_C1_1,     driveRight,    tmotorTetrix, openLoop, encoder)
+#pragma config(Motor,  mtr_S1_C1_2,     driveLeft,     tmotorTetrix, openLoop, reversed, encoder)
 #pragma config(Motor,  mtr_S1_C2_1,     beltMotor,     tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_2,     liftMotor,     tmotorTetrix, openLoop)
-#pragma config(Servo,  srvo_S2_C1_1,    goalServo,           tServoStandard)
+#pragma config(Servo,  srvo_S2_C1_1,    goalServo,            tServoStandard)
 #pragma config(Servo,  srvo_S2_C1_2,    servo2,               tServoNone)
 #pragma config(Servo,  srvo_S2_C1_3,    servo3,               tServoNone)
 #pragma config(Servo,  srvo_S2_C1_4,    servo4,               tServoNone)
@@ -19,85 +17,64 @@
 
 //int dummyVariable;
 //int otherDummyVariable;
+const int oneRotation = 1440;
+const float circumferenceOfWheel = 12.57;
+const int overEncoderAmount = 1500;
+const float encoderTicksPerInch =  oneRotation / circumferenceOfWheel;
+
+
+void turnRight(int degree);
+void turnLeft(int degree);
+void goForward(int dist);
 
 void initializeRobot()
 {
   servo[goalServo] = 9; //Initializes servo to start position
   return;
 }
-
+\
 task main()
 {
-  initializeRobot();
-
-  nMotorEncoder[driveLeft] = 0;
-  nMotorEncoder[driveRight] = 0;
-
-  nMotorEncoderTarget[driveLeft] = -720;
-  nMotorEncoderTarget[driveRight] = -720;
-
-  motor[driveLeft] = 50;
-  motor[driveRight] = 50;
-  /*wait1Msec(200);
-  while(true)
-{
-dummyVariable = nMotorEncoder[driveLeft];
-otherDummyVariable = nMotorEncoder[ driveRight ];
-nxtDisplayTextLine(3,"%d",dummyVariable);
-nxtDisplayTextLine(4,"%d",otherDummyVariable);
+	initializeRobot();
+	//waitForStart(); // Wait for the beginning of autonomous phase.
+  bFloatDuringInactiveMotorPWM = false;
+  goForward(36);
 }
-*/
-while(nMotorRunState[driveRight] != runStateIdle && nMotorRunState[driveRight] != runStateIdle){}
-
-motor[driveLeft] = 0;
-motor[driveRight] = 0;
 
 
-  //waitForStart(); // Wait for the beginning of autonomous phase.
-/*
-	motor[ driveLeft ] = -100;
-	motor[ driveRight ] = -100;
-	wait1Msec( 3000 );
 
-	motor[ driveLeft ] = 100;
-	motor[ driveRight ] = -100;
-	wait1Msec( 500 );
 
-	if( SensorValue[ IRSensor ] == 5 || SensorValue[ IRSensor ] == 6 )
+void goForward(int dist) //inches
+{
+	int encoderTicksNeeded = -(dist * encoderTicksPerInch);
+	nMotorEncoder[driveLeft] = 0;
+  nMotorEncoder[driveRight] = 0;
+  int hispeedTicks = encoderTicksNeeded + overEncoderAmount;
+ 	while(nMotorEncoder[driveLeft] > hispeedTicks && nMotorEncoder[driveRight] > hispeedTicks)
 	{
-		motor[ driveLeft ] = 100;
-		motor[ driveRight ] = -100;
-		wait1Msec( 500 );
+		motor[driveLeft] = 50;
+  	motor[driveRight] = 50;
+	}
+//	motor[driveLeft] = 0;
+ // motor[driveRight] = 0;
+ // wait1Msec(1000);
+	while(nMotorEncoder[driveLeft] > encoderTicksNeeded && nMotorEncoder[driveRight] > encoderTicksNeeded)
+	{
+		motor[driveLeft] = 10;
+		motor[driveRight] = 10;
+	}
+	motor[driveLeft] = 0;
+	motor[driveRight] = 0;
+}
 
-		motor[ driveLeft ] = -100;
-		motor[ driveRight ] = -100;
-		wait1Msec( 500 );
+void turnRight(int degree )
+{
+	nMotorEncoder[driveLeft] = 0;
+  nMotorEncoder[driveRight] = 0;
+}
 
-		motor[ driveLeft ] =-100;
-		motor[ driveRight ] = 100;
-		wait1Msec( 1000 );
-
-		motor[ driveLeft ] = -100;
-		motor[ driveRight ] = -100;
-		wait1Msec( 2500 );
-
-		}
-
-		else if(SensorValue[ IRSensor ] == 0)
-		{
-			motor[ driveLeft ] = -100;
-			motor[ driveRight ] = -100;
-			wait1Msec( 1500 );
-
-			motor[ driveRight ] = -100;
-			motor[ driveLeft ] = 100;
-			wait1Msec( 250 );
-
-		}
-
-  while (true)
-  {
-  	motor[ driveLeft ] = 0;
-  	motor[ driveRight ] = 0;
-  }*/
+void turnLight(int degree )
+{
+	nMotorEncoder[driveLeft] = 0;
+  nMotorEncoder[driveRight] = 0;
 }
