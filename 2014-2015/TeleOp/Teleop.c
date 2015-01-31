@@ -7,10 +7,10 @@
 #pragma config(Motor,  motorC,           ,             tmotorNXT, openLoop)
 #pragma config(Motor,  mtr_S1_C1_1,     driveRight,    tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C1_2,     driveLeft,     tmotorTetrix, openLoop, reversed)
-#pragma config(Motor,  mtr_S1_C2_1,     scissorLifter, tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C2_1,     scissorLifter, tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C2_2,     ballShooter,   tmotorTetrix, openLoop)
 #pragma config(Servo,  srvo_S2_C1_1,    goalServo,            tServoStandard)
-#pragma config(Servo,  srvo_S2_C1_2,    servo2,               tServoNone)
+#pragma config(Servo,  srvo_S2_C1_2,    bucketServo,          tServoStandard)
 #pragma config(Servo,  srvo_S2_C1_3,    servo3,               tServoNone)
 #pragma config(Servo,  srvo_S2_C1_4,    servo4,               tServoNone)
 #pragma config(Servo,  srvo_S2_C1_5,    servo5,               tServoNone)
@@ -61,7 +61,6 @@ void scissorLift();
 
 
 
-
 //The main task will run the robot initialization and then will wait for the signal from FCS
 //to begin and enter the continuous loop that recieves joystick values and executes functions
 //with this data.
@@ -87,8 +86,9 @@ task main()
 //Sets all values and servos prior to the start of the telop mode.
 void initializeRobot()
 {
-	servo[goalServo] = 9; //Initializes servo to start position
-}
+	servo[goalServo] = 250; //Initializes servo to start position
+	servo[bucketServo] = 0;
+	}
 
 //Recieves joystick data from controllers then modifies that value
 //and sets the motor equal to the modified value.
@@ -97,8 +97,8 @@ void moveRobot()
 	//Sanitize low values from the joysticks
 	if(abs(joystick.joy1_y1) < 5 && abs(joystick.joy1_y2) < 5)
 	{
-		motor[driveLeft]	=	0;
-		motor[driveRight]	=	0;
+		motor[driveLeft]	=	NOPOWER;
+		motor[driveRight]	=	NOPOWER;
 	}
 	else
 	{
@@ -147,10 +147,10 @@ void toggleDirection()
 
 void toggleGoalMover()
 {
-	if( joy1Btn( BUTTONB ) || joy2Btn( BUTTONB ))
+	if( joy1Btn( BUTTONB ))
 	{
-		int upPosition = 0;
-		int downPosition = 195;
+		int upPosition = 250;
+		int downPosition = 40;
 
 		if( !shiftGoal && ServoValue[goalServo] != downPosition )
 		{
@@ -170,16 +170,20 @@ void toggleGoalMover()
 
 void scissorLift()
 {
-	if( joy1Btn( BUTTONRB ) || joy2Btn( BUTTONRB ) )
+	if( abs( joystick.joy2_y1 ) < 5 )
 	{
-		motor[scissorLifter] = HALFPOWER;
-	}
-	else if( joy1Btn( BUTTONRT ) || joy2Btn( BUTTONRT ) )
-	{
-		motor[scissorLifter] = -HALFPOWER;
+		motor[ scissorLifter ]	=	NOPOWER;
 	}
 	else
 	{
-		motor[scissorLifter] = NOPOWER;
+		motor[scissorLifter]	= joystick.joy2_y1;
+	}
+	if ( joy2Btn( BUTTONB ) )
+	{
+	servo[ bucketServo ] = 60;
+	}
+	else if ( joy2Btn( BUTTONX ) )
+	{
+	servo[ bucketServo ] = 0;
 	}
 }

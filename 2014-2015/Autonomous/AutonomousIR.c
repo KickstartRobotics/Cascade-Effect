@@ -29,7 +29,7 @@ void goForward(int dist);
 
 void initializeRobot()
 {
-  servo[goalServo] = 9; //Initializes servo to start position
+  servo[goalServo] = 250; //Initializes servo to start position
   return;
 }
 \
@@ -39,12 +39,14 @@ task main()
 	//waitForStart(); // Wait for the beginning of autonomous phase.
   bFloatDuringInactiveMotorPWM = false;
   goForward(36);
+  nxtDisplayCenteredTextLine ( 3, "Sensor Value: %d", SensorValue[SonarSensor]);  // display "Sensor Value: ##"
+  wait1Msec ( 100 );
 }
 
 
 
 
-void goForward(int dist) //inches
+void goForward(int dist) //centimeters
 {
 	int encoderTicksNeeded = -(dist * encoderTicksPerInch);
 	nMotorEncoder[driveLeft] = 0;
