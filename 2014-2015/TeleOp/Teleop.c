@@ -8,7 +8,7 @@
 #pragma config(Motor,  mtr_S1_C1_1,     driveRight,    tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C1_2,     driveLeft,     tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C2_1,     scissorLifter, tmotorTetrix, openLoop, reversed)
-#pragma config(Motor,  mtr_S1_C2_2,     ballShooter,   tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C2_2,     ballLifter,   tmotorTetrix, openLoop)
 #pragma config(Servo,  srvo_S2_C1_1,    goalServo,            tServoStandard)
 #pragma config(Servo,  srvo_S2_C1_2,    bucketServo,          tServoStandard)
 #pragma config(Servo,  srvo_S2_C1_3,    servo3,               tServoNone)
@@ -58,6 +58,7 @@ void toggleSlow();
 void toggleDirection();
 void toggleGoalMover();
 void scissorLift();
+void conveyerBelt();
 
 
 
@@ -79,6 +80,7 @@ task main()
 		toggleDirection();
 		toggleGoalMover();
 		scissorLift();
+		conveyerBelt();
   }
 }
 //*Functions*//
@@ -102,8 +104,16 @@ void moveRobot()
 	}
 	else
 	{
+		if(moveModifier > 0)
+		{
 		motor[driveRight]	= joystick.joy1_y2 / moveModifier;
 		motor[driveLeft]	= joystick.joy1_y1 / moveModifier;
+		}
+		else
+		{
+		motor[driveRight]	= joystick.joy1_y1 / moveModifier;
+		motor[driveLeft]	= joystick.joy1_y2 / moveModifier;
+		}
 	}
 
 }
@@ -176,7 +186,7 @@ void scissorLift()
 	}
 	else
 	{
-		motor[scissorLifter]	= joystick.joy2_y1;
+		motor[scissorLifter]	= joystick.joy2_y1 *= -1;
 	}
 	if ( joy2Btn( BUTTONB ) )
 	{
@@ -185,5 +195,17 @@ void scissorLift()
 	else if ( joy2Btn( BUTTONX ) )
 	{
 	servo[ bucketServo ] = 0;
+	}
+}
+
+void conveyerBelt()
+{
+	if( abs( joystick.joy2_y2 ) < 5 )
+	{
+		motor[ ballLifter ]	=	NOPOWER;
+	}
+	else
+	{
+		motor[ballLifter]	= joystick.joy2_y2;
 	}
 }
