@@ -88,8 +88,8 @@ task main()
 //Sets all values and servos prior to the start of the telop mode.
 void initializeRobot()
 {
-	servo[goalServo] = 250; //Initializes servo to start position
-	servo[bucketServo] = 0;
+	servo[ goalServo ] = 250; //Initializes servo to start position
+	servo[ bucketServo ] = 0;
 	}
 
 //Recieves joystick data from controllers then modifies that value
@@ -97,37 +97,33 @@ void initializeRobot()
 void moveRobot()
 {
 	//Sanitize low values from the joysticks
-	if(abs(joystick.joy1_y1) < 5 && abs(joystick.joy1_y2) < 5)
+	if( abs( joystick.joy1_y1 ) < 5 && abs( joystick.joy1_y2 ) < 5 )
 	{
-		motor[driveLeft]	=	NOPOWER;
-		motor[driveRight]	=	NOPOWER;
+		motor[ driveLeft ]	=	NOPOWER;
+		motor[ driveRight ]	=	NOPOWER;
+	}
+	else if( moveModifier > 0 )
+	{
+		motor[ driveRight ]	= joystick.joy1_y2 / moveModifier;
+		motor[ driveLeft ]	= joystick.joy1_y1 / moveModifier;
 	}
 	else
 	{
-		if(moveModifier > 0)
-		{
-		motor[driveRight]	= joystick.joy1_y2 / moveModifier;
-		motor[driveLeft]	= joystick.joy1_y1 / moveModifier;
-		}
-		else
-		{
-		motor[driveRight]	= joystick.joy1_y1 / moveModifier;
-		motor[driveLeft]	= joystick.joy1_y2 / moveModifier;
-		}
+		motor[ driveRight ]	= joystick.joy1_y1 / moveModifier;
+		motor[ driveLeft ]	= joystick.joy1_y2 / moveModifier;
 	}
-
 }
 
 void toggleSlow()
 {
-	if(joy1Btn(BUTTONA) || joy2Btn(BUTTONA))
+	if( joy1Btn( BUTTONA ) || joy2Btn( BUTTONA ) )
 	{
-		if(!shiftSlowMo && abs(moveModifier) == 1)
+		if( !shiftSlowMo && abs( moveModifier ) == 1 )
 		{
 			moveModifier *= 5; //divides the input of controllers to motors by 5
 		}
 
-		else if(!shiftSlowMo && abs(moveModifier) > 1)
+		else if( !shiftSlowMo && abs( moveModifier ) > 1 )
 		{
 			moveModifier /= 5; //changes the input of controllers to motors back to 1
 		}
@@ -141,9 +137,9 @@ void toggleSlow()
 
 void toggleDirection()
 {
-	if(joy1Btn(BUTTONY) || joy2Btn(BUTTONY))
+	if( joy1Btn( BUTTONY ) || joy2Btn( BUTTONY ) )
 	{
-		if(!shiftDirection)
+		if( !shiftDirection )
 		{
 			moveModifier *= -1; //changes the controller input to the motors to the oppisite of what it is
 		}
@@ -157,18 +153,18 @@ void toggleDirection()
 
 void toggleGoalMover()
 {
-	if( joy1Btn( BUTTONB ))
+	if( joy1Btn( BUTTONB ) )
 	{
 		int upPosition = 250;
 		int downPosition = 40;
 
-		if( !shiftGoal && ServoValue[goalServo] != downPosition )
+		if( !shiftGoal && ServoValue[ goalServo ] != downPosition )
 		{
-			servo[goalServo] = downPosition;
+			servo[ goalServo ] = downPosition;
 		}
-		else if( !shiftGoal && ServoValue[goalServo] != upPosition )
+		else if( !shiftGoal && ServoValue[ goalServo ] != upPosition )
 		{
-			servo[goalServo] = upPosition;
+			servo[ goalServo ] = upPosition;
 		}
 		shiftGoal = true;
 	}
@@ -186,7 +182,7 @@ void scissorLift()
 	}
 	else
 	{
-		motor[scissorLifter]	= joystick.joy2_y1 *= -1;
+		motor[ scissorLifter ]	= joystick.joy2_y1 *= -1;
 	}
 	if ( joy2Btn( BUTTONB ) )
 	{
@@ -206,6 +202,6 @@ void conveyerBelt()
 	}
 	else
 	{
-		motor[ballLifter]	= joystick.joy2_y2;
+		motor[ ballLifter ]	= joystick.joy2_y2;
 	}
 }

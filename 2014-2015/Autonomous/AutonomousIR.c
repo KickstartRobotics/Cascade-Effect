@@ -17,14 +17,14 @@
 //int dummyVariable;
 //int otherDummyVariable;
 const int ONEROTATION = 1410;
-const float CIRCUMFERENCEOFWHEEL = 31.9;
-const float TURNINGCIRCUMFERENCE = 136.66;
+const int QUARTERTURNATHALFPOWER = 2350;
 const int overEncoderAmount = 2000; //
+const int CIRCUMFERENCEOFWHEEL = 31.9;
 const float encoderTicksPerCentimeters =  ONEROTATION / CIRCUMFERENCEOFWHEEL;
 
 
 //Function Prototyping
-void turnRight( int degree );
+void turnRight(int degree);
 void turnLeft( int degree );
 void goForward( int distance );
 
@@ -41,7 +41,7 @@ task main()
 	initializeRobot();
 	//waitForStart(); // Wait for the beginning of autonomous phase.
   //goForward( 100 );
-  turnRight( 100 );
+  turnRight( 180 );
   //nxtDisplayCenteredtextLine ( 3, "Sensor Value: %d", SensorValue[ SonarSensor ] );  // display "Sensor Value: ##"
   wait1Msec ( 100 );
 }
@@ -73,13 +73,12 @@ void goForward( int distance ) //centimeters
 	motor[ driveRight ] = 0;
 }
 
-void turnRight( int degree )
+void turnRight(int degree )
 {
-	float encoderTicksNeeded = -( ( degree / 360 ) * CIRCUMFERENCEOFWHEEL * encoderTicksPerCentimeters * TURNINGCIRCUMFERENCE);
 	nMotorEncoder[ driveLeft ] = 0;
   nMotorEncoder[ driveRight ] = 0;
-
-  while( nMotorEncoder[ driveLeft ] > encoderTicksNeeded && nMotorEncoder[ driveRight ] < -encoderTicksNeeded )
+  int encoderAmount = QUARTERTURNATHALFPOWER / 90 * degree;
+  while( nMotorEncoder[ driveLeft ] > -encoderAmount && nMotorEncoder[ driveRight ] > -encoderAmount )
 	{
 		motor[ driveLeft ] = 50;
 		motor[ driveRight ] = -50;
