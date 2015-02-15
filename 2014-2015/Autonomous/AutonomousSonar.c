@@ -21,57 +21,44 @@
 #include "JoystickDriver.c"  //Include file to "handle" the Bluetooth messages.
 
 const int SONARSERVOCENTERPOSITION = 117;
-int lowestValue = 255;
-int tickPosition;
+const int START = 78;
+const int STOP = 156;
+const int TRAVELDIST = STOP - START;
+int correctIncrement;
+int sonarValue[TRAVELDIST/3];
+int lowestValue;
+int ticks = 0;
 
-int sonarSweep();
-
+void sonarSweep();
+void readValues();
 void initializeRobot()
+
 {
-	servo[servo1] = 250;
-	servo[sonarServo] = SONARSERVOCENTERPOSITION;
+	servo[servo1] = 40;
+	servo[sonarServo] = START;
   // Place code here to sinitialize servos to starting positions.
   // Sensors are automatically configured and setup by ROBOTC. They may need a brief time to stabilize.
 
   return;
 }
 
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//                                         Main Task
-//
-// The following is the main code for the autonomous robot operation. Customize as appropriate for
-// your specific robot.
-//
-// The types of things you might do during the autonomous phase (for the 2008-9 FTC competition)
-// are:
-//
-//   1. Have the robot follow a line on the game field until it reaches one of the puck storage
-//      areas.
-//   2. Load pucks into the robot from the storage bin.
-//   3. Stop the robot and wait for autonomous phase to end.
-//
-// This simple template does nothing except play a periodic tone every few seconds.
-//
-// At the end of the autonomous period, the FMS will autonmatically abort (stop) execution of the program.
-//
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-
 task main()
 {
   initializeRobot();
 
   //waitForStart(); // Wait for the beginning of autonomous phase.
-  int sonar;
-  for(int i =0; i < 3;i++)
-  {
-  	sonarSweep();
-	}
-	servo[sonarServo] = tickPosition;
 
-  while (true)
-  {
+
+
+	//servo[sonarServo] = tickPosition;=
+  	wait1Msec(1000);
+  	sonarSweep();
+  	wait1Msec(1);
+  	readValues();
+  	wait1Msec(1);
+  	int servoLowestPosition =(correctIncrement + 1 + ticks / 2 ) * 3 + START;
+  	servo[sonarServo] = (int) servoLowestPosition;
+  	wait1Msec(1000);
   	/*sonar = SensorValue[sonarSensor];
 
   	if( sonar < 50 && sonar > 25 )
@@ -84,35 +71,43 @@ task main()
 	 		motor[motorR] = 	0;
 	 		motor[motorL] = 	0;
 	 }*/
-  }
+
 }
-int sonarSweep()
+void sonarSweep()
 {
-	const int START = 58;
-	const int STOP = 175;
-
-	for(int i = START; i < STOP ;i++)
+	int tempSonarValue;
+	int increment = 0;
+	for(int i = START; i < STOP ;i+=3)
 	{
+		tempSonarValue = 250;
 		servo[sonarServo] = i;
-		int ticks = 0;
-
-		if(SensorValue[sonarSensor] < lowestValue)
+		for(int x = 0; x < 5; x++)
+		{
+			if ( SensorValue[sonarSensor] < tempSonarValue )
+			{
+					tempSonarValue = SensorValue[sonarSensor];
+			}
+			wait1Msec(35);
+		}
+		sonarValue[increment] = tempSonarValue;
+		increment++;
+		/*if(SensorValue[sonarSensor] < lowestValue)
 		{
 			if (SensorValue[sonarSensor] < (20 + lowestValue) && SensorValue[sonarSensor]  > (lowestValue - 20) && SensorValue[sonarSensor] < 250)
 			{
 				ticks++;
+				lowestValue 	= SensorValue[sonarSens
 			}
 			else if(SensorValue[sonarServo] < lowestValue)
-			{
-				lowestValue 	= SensorValue[sonarSensor];
+			{or];
 				tickPosition 	= ServoValue[sonarServo];
 			}
 
-			tickposition  += ticks/2;
-		}
-		wait10Msec(1);
+			tickPosition  += ticks/2;
+		}*/
+		//wait10Msec(20);
 	}
-	for(int i = STOP; i > START ;i--)
+/*	for(int i = STOP; i > START ;i--)
 	{
 		int ticks =0;
 		servo[sonarServo] = i;
@@ -131,8 +126,27 @@ int sonarSweep()
 			tickposition  -= ticks/2;
 		}
 		wait10Msec(1);
-	}
+	}*/
 
 	//servo[sonarServo] = SONARSERVOCENTERPOSITION;
-	return (90.0/117) * tickPosition;
+	//return (90.0/117) * tickPosition;
+}
+
+void readValues()
+{
+	lowestValue = sonarValue[0];
+
+	for (int i = 0; i < TRAVELDIST/3; i++)
+	{
+		if ( sonarValue[i] < lowestValue )
+		{
+			lowestValue = sonarValue[i];
+			correctIncrement = i;
+			ticks = 0;
+		}
+		else if ( sonarValue[i] == lowestValue)
+		{
+			ticks++;
+		}
+	}
 }
