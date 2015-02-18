@@ -3,14 +3,14 @@
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Sensor, S2,     ,               sensorI2CMuxController)
 #pragma config(Sensor, S3,     sonarSensor,    sensorSONAR)
-#pragma config(Motor,  mtr_S1_C1_1,     motorR,        tmotorTetrix, openLoop, reversed)
-#pragma config(Motor,  mtr_S1_C1_2,     motorL,        tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C1_1,     driveRight,    tmotorTetrix, openLoop, encoder)
+#pragma config(Motor,  mtr_S1_C1_2,     driveLeft,     tmotorTetrix, openLoop, reversed, encoder)
 #pragma config(Motor,  mtr_S1_C2_1,     motorFlag,     tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_2,     motorLift,     tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C3_1,     motorLift2,    tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C3_2,     motorI,        tmotorTetrix, openLoop)
 #pragma config(Servo,  srvo_S2_C1_1,    servoIRbucket,        tServoStandard)
-#pragma config(Servo,  srvo_S2_C1_2,    sonarServo,               tServoNone)
+#pragma config(Servo,  srvo_S2_C1_2,    sonarServo,           tServoNone)
 #pragma config(Servo,  srvo_S2_C1_3,    servo3,               tServoNone)
 #pragma config(Servo,  srvo_S2_C1_4,    servo4,               tServoNone)
 #pragma config(Servo,  srvo_S2_C1_5,    servo5,               tServoNone)
@@ -22,43 +22,57 @@
 
 const int SONARSERVOCENTERPOSITION = 117;
 const int START = 78;
-const int STOP = 156;
+const int STOP = 158;
 const int TRAVELDIST = STOP - START;
-int correctIncrement;
-int sonarValue[TRAVELDIST/3];
-int lowestValue;
-int ticks = 0;
+const int ONEROTATION = 1410;
+const int QUARTERTURNATHALFPOWER = 2100;
+const int overEncoderAmount = 2000; //
+const int CIRCUMFERENCEOFWHEEL = 31.9;
+const float encoderTicksPerCentimeters =  ONEROTATION / CIRCUMFERENCEOFWHEEL;
 
-void sonarSweep();
-void readValues();
+
+
+typedef struct SonarDataStruct
+{
+	int servoPosition;
+	int detectionTicks; //.769 degrees per tick
+	int sonarDistance;
+}SonarData;
+
+void turnRight(int degree);
+void turnLeft( int degree );
+void goForward( int distance );
+void sonarSweep(int* array);
+void readValues(int* array,SonarData *calculatedValues);
+void turnToObject(int servoPosition);
+void scanAndTurn(SonarData* calculatedValues);
 void initializeRobot()
 
 {
-	servo[servo1] = 40;
+	servo[servo1] = 250;
 	servo[sonarServo] = START;
-  // Place code here to sinitialize servos to starting positions.
-  // Sensors are automatically configured and setup by ROBOTC. They may need a brief time to stabilize.
 
-  return;
 }
 
 task main()
 {
   initializeRobot();
+	//waitForStart(); // Wait for the beginning of autonomous phase.
 
-  //waitForStart(); // Wait for the beginning of autonomous phase.
+	SonarData calculatedValues;
 
+		goForward(200);
+	//servo[sonarServo] = tickPosition;
+		scanAndTurn(calculatedValues);
+		scanAndTurn(calculatedValues);
 
+  	goForward(calculatedValues.sonarDistance/4);
 
-	//servo[sonarServo] = tickPosition;=
-  	wait1Msec(1000);
-  	sonarSweep();
-  	wait1Msec(1);
-  	readValues();
-  	wait1Msec(1);
-  	int servoLowestPosition =(correctIncrement + 1 + ticks / 2 ) * 3 + START;
-  	servo[sonarServo] = (int) servoLowestPosition;
-  	wait1Msec(1000);
+  	scanAndTurn(calculatedValues);
+  	scanAndTurn(calculatedValues);
+  	goForward(calculatedValues.sonarDistance/4);
+  	scanAndTurn(calculatedValues);
+
   	/*sonar = SensorValue[sonarSensor];
 
   	if( sonar < 50 && sonar > 25 )
@@ -73,10 +87,12 @@ task main()
 	 }*/
 
 }
-void sonarSweep()
+void sonarSweep(int* array)
 {
+
 	int tempSonarValue;
 	int increment = 0;
+
 	for(int i = START; i < STOP ;i+=3)
 	{
 		tempSonarValue = 250;
@@ -89,64 +105,110 @@ void sonarSweep()
 			}
 			wait1Msec(35);
 		}
-		sonarValue[increment] = tempSonarValue;
+		array[increment] = tempSonarValue;			//Assign values to array
 		increment++;
-		/*if(SensorValue[sonarSensor] < lowestValue)
-		{
-			if (SensorValue[sonarSensor] < (20 + lowestValue) && SensorValue[sonarSensor]  > (lowestValue - 20) && SensorValue[sonarSensor] < 250)
-			{
-				ticks++;
-				lowestValue 	= SensorValue[sonarSens
-			}
-			else if(SensorValue[sonarServo] < lowestValue)
-			{or];
-				tickPosition 	= ServoValue[sonarServo];
-			}
-
-			tickPosition  += ticks/2;
-		}*/
-		//wait10Msec(20);
 	}
-/*	for(int i = STOP; i > START ;i--)
-	{
-		int ticks =0;
-		servo[sonarServo] = i;
-		if(SensorValue[sonarSensor] < lowestValue)
-		{
-			if (SensorValue[sonarSensor] < (20 + lowestValue) && SensorValue[sonarSensor]  > (lowestValue - 20) && SensorValue[sonarSensor] <250)
-			{
-				ticks++;
-			}
-			else if(SensorValue[sonarServo] < lowestValue)
-			{
-				lowestValue 	= SensorValue[sonarSensor];
-				tickPosition 	= ServoValue[sonarServo];
-			}
-
-			tickposition  -= ticks/2;
-		}
-		wait10Msec(1);
-	}*/
-
-	//servo[sonarServo] = SONARSERVOCENTERPOSITION;
-	//return (90.0/117) * tickPosition;
 }
 
-void readValues()
+void readValues(int* array,SonarData *calculatedValues)
 {
-	lowestValue = sonarValue[0];
+	calculatedValues->sonarDistance = array[0];
 
 	for (int i = 0; i < TRAVELDIST/3; i++)
 	{
-		if ( sonarValue[i] < lowestValue )
+		if ( array[i] < calculatedValues->sonarDistance )
 		{
-			lowestValue = sonarValue[i];
-			correctIncrement = i;
-			ticks = 0;
+			calculatedValues->sonarDistance = array[i];
+			calculatedValues->servoPosition = i;
+			calculatedValues->detectionTicks = 0;
 		}
-		else if ( sonarValue[i] == lowestValue)
+		else if ( array[i] == calculatedValues->sonarDistance)
 		{
-			ticks++;
+			calculatedValues->detectionTicks++;
 		}
 	}
+}
+
+void goForward( int distance ) //centimeters
+{
+	int encoderTicksNeeded = -( distance * encoderTicksPerCentimeters );
+	nMotorEncoder[ driveLeft ] = 0;
+  nMotorEncoder[ driveRight ] = 0;
+  int hiSpeedTicks = encoderTicksNeeded + overEncoderAmount;
+
+ 	while( nMotorEncoder[ driveLeft ] > hiSpeedTicks && nMotorEncoder[ driveRight ] > hiSpeedTicks )
+	{
+		motor[ driveLeft ] = 50;
+  	motor[ driveRight ] = 50;
+	}
+// motor[ driveLeft ] = 0;
+// motor[ driveRight ] = 0;
+// wait1Msec( 1000 );
+	while( nMotorEncoder[ driveLeft ] > encoderTicksNeeded && nMotorEncoder[ driveRight ] > encoderTicksNeeded )
+	{
+		motor[ driveLeft ] = 10;
+		motor[ driveRight ] = 10;
+	}
+	motor[ driveLeft ] = 0;
+	motor[ driveRight ] = 0;
+}
+
+void turnRight(int degree )
+{
+	nMotorEncoder[ driveLeft ] = 0;
+  nMotorEncoder[ driveRight ] = 0;
+  int encoderAmount = QUARTERTURNATHALFPOWER / 90 * degree;
+  while( nMotorEncoder[ driveLeft ] > -encoderAmount && nMotorEncoder[ driveRight ] > -encoderAmount )
+	{
+		motor[ driveLeft ] = 50;
+		motor[ driveRight ] = -50;
+	}
+	motor[ driveLeft ] = 0;
+	motor[ driveRight ] = 0;
+}
+
+void turnLeft( int degree )
+{
+	nMotorEncoder[ driveLeft ] = 0;
+  nMotorEncoder[ driveRight ] = 0;
+  int encoderAmount = QUARTERTURNATHALFPOWER / 90 * degree;
+
+  //Turn
+  while( nMotorEncoder[ driveLeft ] > -encoderAmount && nMotorEncoder[ driveRight ] > -encoderAmount )
+	{
+		motor[ driveLeft ] = -50;
+		motor[ driveRight ] = 50;
+	}
+
+	//Stop robot
+	motor[ driveLeft ] = 0;
+	motor[ driveRight ] = 0;
+}
+
+
+void turnToObject(int servoPosition)
+{
+	if( servoPosition < 117 )
+	{
+		turnLeft((SONARSERVOCENTERPOSITION - servoPosition ) * .769);
+	}
+	else
+	{
+		turnRight((servoPosition - SONARSERVOCENTERPOSITION) * .769);
+	}
+}
+void scanAndTurn(SonarData* calculatedValues)
+{
+		int servoTargetPosition;
+  	int sonarValue[TRAVELDIST/3];
+
+	  wait1Msec(1000);
+  	sonarSweep(sonarValue);
+  	wait1Msec(1);
+  	readValues(sonarValue, calculatedValues);
+  	wait1Msec(1);
+  	servoTargetPosition =(calculatedValues->servoPosition + 1 + calculatedValues->detectionTicks / 2 ) * 3 + START;
+  	turnToObject(servoTargetPosition);
+
+  	servo[sonarServo] = SONARSERVOCENTERPOSITION;
 }

@@ -28,6 +28,7 @@ void turnRight(int degree);
 void turnLeft( int degree );
 void goForward( int distance );
 int getIrReading( tSensors irReceiverPin);
+
 //Sets initialization values
 void initializeRobot()
 {
@@ -112,11 +113,15 @@ void turnLeft( int degree )
 	nMotorEncoder[ driveLeft ] = 0;
   nMotorEncoder[ driveRight ] = 0;
   int encoderAmount = QUARTERTURNATHALFPOWER / 90 * degree;
+
+  //Turn
   while( nMotorEncoder[ driveLeft ] > -encoderAmount && nMotorEncoder[ driveRight ] > -encoderAmount )
 	{
 		motor[ driveLeft ] = -50;
 		motor[ driveRight ] = 50;
 	}
+
+	//Stop robot
 	motor[ driveLeft ] = 0;
 	motor[ driveRight ] = 0;
 }
