@@ -41,30 +41,66 @@ task main()
 	bFloatDuringInactiveMotorPWM = false;  //Motor brakes when idle
 	initializeRobot();
 	//waitForStart(); // Wait for the beginning of autonomous phase.
-	while( true )
+	wait1Msec(1000);
+	goForward(25);
+	wait1Msec(1000);
+
+	//*Position 1 and 3 Code
+	//Position 1
+	if(SensorValue[IRSensor] == 5)
 	{
-		if (getIrReading ( IRSensor ) == 5)
-		{
-				motor[ driveLeft ] = 0;
-				motor[ driveRight ] = 0;
-		}
-		else if (getIrReading ( IRSensor ) < 5)
-		{
-			turnLeft(5);
-		}
-		else if (getIrReading ( IRSensor ) > 5)
-		{
-			turnRight(5);
-		}
-		else
-		{
-			motor[ driveLeft ] = 0;
-			motor[ driveRight ] = 0;
-		}
+			goForward(31);
+			wait1Msec(700);
+			turnRight(50);
+			wait1Msec(1000);
+			goForward(66);
+			wait1Msec(1000);
+			turnLeft(45);
+			wait1Msec(1000);
+			turnLeft(66);
+	  	wait1Msec(1000);
+			goForward(120);
+
+	}
+	else if(SensorValue[ IRSensor ] == 4)
+	{
+				goForward(135);
 	}
 
-  //nxtDisplayCenteredtextLine ( 3, "Sensor Value: %d", SensorValue[ SonarSensor ] );  // display "Sensor Value: ##"
-  wait1Msec ( 100 );
+	//Position 2 Code
+	else
+	{
+				goForward(30);
+				wait1Msec(700);
+				turnLeft(45);
+				wait1Msec(700);
+				goForward(35);
+				wait1Msec(700);
+				turnRight(100);
+				wait1Msec(700);
+				goForward(60);
+	}
+	/*
+	else
+	{
+			goForward(61);
+			if (getIrReading ( IRSensor ) == 5)
+			{
+
+			}
+			else if (getIrReading ( IRSensor ) == 3)
+			{
+					goForward(61);
+					turnLeft(90);
+					goForward(61);
+			}
+	}*/
+
+	//while(true)
+	//{
+ // 	nxtDisplayCenteredtextLine ( 3, "Sensor Value: %d", SensorValue[ IRSensor ] );  // display "Sensor Value: ##"
+ //	  wait1Msec ( 100 );
+	//}
 }
 
 
@@ -77,19 +113,20 @@ void goForward( int distance ) //centimeters
   nMotorEncoder[ driveRight ] = 0;
   int hiSpeedTicks = encoderTicksNeeded + overEncoderAmount;
 
- 	while( nMotorEncoder[ driveLeft ] > hiSpeedTicks && nMotorEncoder[ driveRight ] > hiSpeedTicks )
+ 	while( nMotorEncoder[ driveLeft ] > encoderTicksNeeded && nMotorEncoder[ driveRight ] > encoderTicksNeeded )
 	{
-		motor[ driveLeft ] = 50;
-  	motor[ driveRight ] = 50;
+		motor[ driveLeft ] = 100;
+  	motor[ driveRight ] = 100;
 	}
 // motor[ driveLeft ] = 0;
 // motor[ driveRight ] = 0;
 // wait1Msec( 1000 );
-	while( nMotorEncoder[ driveLeft ] > encoderTicksNeeded && nMotorEncoder[ driveRight ] > encoderTicksNeeded )
+/*	while( nMotorEncoder[ driveLeft ] > encoderTicksNeeded && nMotorEncoder[ driveRight ] > encoderTicksNeeded )
 	{
 		motor[ driveLeft ] = 10;
 		motor[ driveRight ] = 10;
 	}
+	*/
 	motor[ driveLeft ] = 0;
 	motor[ driveRight ] = 0;
 }
