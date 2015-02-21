@@ -10,7 +10,7 @@
 #pragma config(Motor,  mtr_S1_C2_1,     scissorLifter, tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C2_2,     ballLifter,   tmotorTetrix, openLoop)
 #pragma config(Servo,  srvo_S2_C1_1,    goalServo,            tServoStandard)
-#pragma config(Servo,  srvo_S2_C1_2,    bucketServo,          tServoStandard)
+#pragma config(Servo,  srvo_S2_C1_2,    sonarServo,          tServoStandard)
 #pragma config(Servo,  srvo_S2_C1_3,    servo3,               tServoNone)
 #pragma config(Servo,  srvo_S2_C1_4,    servo4,               tServoNone)
 #pragma config(Servo,  srvo_S2_C1_5,    servo5,               tServoNone)
@@ -51,6 +51,9 @@ bool shiftSlowMo 				= false;
 bool shiftDirection			= false;
 bool shiftGoal					= false;
 
+//Servo Constants
+const int SONARCENTER		= 117;
+
 //*Function Prototypes*//
 void initializeRobot();
 void moveRobot();
@@ -89,7 +92,7 @@ task main()
 void initializeRobot()
 {
 	servo[ goalServo ] = 250; //Initializes servo to start position
-	servo[ bucketServo ] = 0;
+	servo[ sonarServo ] = SONARCENTER;
 	}
 
 //Recieves joystick data from controllers then modifies that value
@@ -156,7 +159,7 @@ void toggleGoalMover()
 	if( joy1Btn( BUTTONB ) )
 	{
 		int upPosition = 250;
-		int downPosition = 40;
+		int downPosition = 35;
 
 		if( !shiftGoal && ServoValue[ goalServo ] != downPosition )
 		{
@@ -186,11 +189,11 @@ void scissorLift()
 	}
 	if ( joy2Btn( BUTTONB ) )
 	{
-	servo[ bucketServo ] = 60;
+	//servo[ bucketServo ] = 60; wrong servo attatched
 	}
 	else if ( joy2Btn( BUTTONX ) )
 	{
-	servo[ bucketServo ] = 0;
+	//servo[ bucketServo ] = 0; Wrong servo
 	}
 }
 
@@ -199,6 +202,14 @@ void conveyerBelt()
 	if( abs( joystick.joy2_y2 ) < 5 )
 	{
 		motor[ ballLifter ]	=	NOPOWER;
+	}
+	else if(	joystick.joy1_Buttons == BUTTONRB)
+	{
+		motor[	ballLifter	]	=	HALFPOWER;
+	}
+	else if(	joystick.joy1_Buttons	==	BUTTONRB)
+	{
+		motor[	ballLifter	] = -HALFPOWER;
 	}
 	else
 	{
