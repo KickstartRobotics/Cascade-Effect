@@ -24,6 +24,7 @@ const float encoderTicksPerCentimeters =  ONEROTATION / CIRCUMFERENCEOFWHEEL;
 const int STARTPOSITION = 250;
 
 //Function Prototyping
+void kickstandSearchAndDestroy();
 void turnRight(int degree);
 void turnLeft( int degree );
 void goForward( int distance );
@@ -44,57 +45,8 @@ task main()
 	wait1Msec(1000);
 	goForward(25);
 	wait1Msec(1000);
+	kickstandSearchAndDestroy();
 
-	//*Position 1 and 3 Code
-	//Position 1
-	if(SensorValue[IRSensor] == 5)
-	{
-			goForward(31);
-			wait1Msec(700);
-			turnRight(50);
-			wait1Msec(1000);
-			goForward(66);
-			wait1Msec(1000);
-			turnLeft(45);
-			wait1Msec(1000);
-			turnLeft(66);
-	  	wait1Msec(1000);
-			goForward(120);
-
-	}
-	else if(SensorValue[ IRSensor ] == 4)
-	{
-				goForward(135);
-	}
-
-	//Position 2 Code
-	else
-	{
-				goForward(30);
-				wait1Msec(700);
-				turnLeft(45);
-				wait1Msec(700);
-				goForward(35);
-				wait1Msec(700);
-				turnRight(100);
-				wait1Msec(700);
-				goForward(60);
-	}
-	/*
-	else
-	{
-			goForward(61);
-			if (getIrReading ( IRSensor ) == 5)
-			{
-
-			}
-			else if (getIrReading ( IRSensor ) == 3)
-			{
-					goForward(61);
-					turnLeft(90);
-					goForward(61);
-			}
-	}*/
 
 	//while(true)
 	//{
@@ -168,4 +120,43 @@ int getIrReading( tSensors irReceiverPin )
 	wait1Msec( 1 );
   int ir = SensorValue[ irReceiverPin ];
   return ir;
+}
+
+void kickstandSearchAndDestroy()
+{
+	//Position 1
+	if(SensorValue[IRSensor] == 5)
+	{
+			goForward(31);
+			wait1Msec(700);
+			turnRight(50);
+			wait1Msec(1000);
+			goForward(66);
+			wait1Msec(1000);
+			turnLeft(45);
+			wait1Msec(1000);
+			turnLeft(66);
+	  	wait1Msec(1000);
+			goForward(120);
+
+	}
+	//Position 3
+	else if(SensorValue[ IRSensor ] == 4)
+	{
+				goForward(135);
+	}
+
+	//Position 2 Code
+	else
+	{
+				goForward(30);
+				wait1Msec(700);
+				turnLeft(45);
+				wait1Msec(700);
+				goForward(35);
+				wait1Msec(700);
+				turnRight(100);
+				wait1Msec(700);
+				goForward(60);
+	}
 }
